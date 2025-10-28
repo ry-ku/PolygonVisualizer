@@ -1,0 +1,13 @@
+@import url("./normalize.css");
+
+body {
+    background-color: #202020;
+}
+
+canvas {
+    display: block;
+    image-rendering: pixelated;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
