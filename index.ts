@@ -50,6 +50,11 @@ function closestPointInPolygon(poly: Point[], pos: Point): Point {
   return closestPoint;
 }
 
+/**
+ * Uses the ray-casting algorithm to determine if the mouse is inside a polygon.
+ * @param poly The polygon to check
+ * @param pos The position of the mouse
+ */
 function isMouseInPolygon(poly: Point[], pos: Point): boolean {
   let crossings = 0;
 
@@ -97,9 +102,8 @@ const pointerCanvasLayer = document.querySelector(
   "#point-layer-canvas",
 ) as HTMLCanvasElement;
 
-// biome-ignore-start lint/style/noNonNullAssertion: It will be there.
+// biome-ignore lint/style/noNonNullAssertion: It will be there.
 var canvasCtx = canvas.getContext("2d")!;
-// biome-ignore-end lint/style/noNonNullAssertion: It will be there.
 
 canvasCtx.strokeStyle = "white";
 
