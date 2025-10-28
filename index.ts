@@ -177,10 +177,12 @@ for (let shapeIndex = 0; shapeIndex <= shapes.length - 1; shapeIndex++) {
     pointerCanvasLayer.addEventListener(
       "mousemove",
       (event) => {
-        const point = closestPointInPolygon(points, {
+        const mousePoint = {
           x: event.clientX,
           y: event.clientY,
-        });
+        };
+
+        const point = closestPointInPolygon(points, mousePoint);
 
         pointers[shapeIndex] = point;
 
@@ -191,16 +193,18 @@ for (let shapeIndex = 0; shapeIndex <= shapes.length - 1; shapeIndex++) {
           pointerCanvasLayer.height,
         );
 
-        if (isMouseInPolygon(points, { x: event.clientX, y: event.clientY })) {
+        if (isMouseInPolygon(points, mousePoint)) {
           activeShape = shapeIndex;
-        } else {
-          if (activeShape === shapeIndex) {
-            activeShape = null;
-          }
+        } else if (activeShape === shapeIndex) {
+          activeShape = null;
         }
 
         pointers.forEach((pointer, index) => {
-          if (index === activeShape) return;
+          if (index === activeShape) {
+            drawPoint(pointerCanvasCtx, mousePoint);
+            return;
+          }
+
           drawPoint(pointerCanvasCtx, pointer);
         });
       },
