@@ -155,6 +155,11 @@ const pointers: Point[] = [];
  */
 let activeShape: number | null = null;
 
+/**
+ * Index of the shape that was previously active (for redrawing optimization)
+ */
+let previousActiveShape: number | null = null;
+
 for (let shapeIndex = 0; shapeIndex <= shapes.length - 1; shapeIndex++) {
   const [movedPoint, ...points] = shapes[shapeIndex];
   canvasCtx.beginPath();
@@ -190,26 +195,34 @@ for (let shapeIndex = 0; shapeIndex <= shapes.length - 1; shapeIndex++) {
 
         pointers[shapeIndex] = point;
 
-        pointerCanvasCtx.clearRect(
-          0,
-          0,
-          pointerCanvasLayer.width,
-          pointerCanvasLayer.height,
-        );
+        const wasInside = isMouseInPolygon(points, mousePoint);
 
-        if (isMouseInPolygon(points, mousePoint)) {
+        // Track shape transition
+        if (wasInside && activeShape !== shapeIndex) {
+          previousActiveShape = activeShape;
           activeShape = shapeIndex;
-        } else if (activeShape === shapeIndex) {
+        } else if (!wasInside && activeShape === shapeIndex) {
+          previousActiveShape = activeShape;
           activeShape = null;
         }
 
-        pointers.forEach((pointer, index) => {
-          if (index === activeShape) {
-            drawPoint(pointerCanvasCtx, mousePoint);
-            return;
-          }
+        // Always redraw when dragging (mousedown is active)
+        requestAnimationFrame(() => {
+          pointerCanvasCtx.clearRect(
+            0,
+            0,
+            pointerCanvasLayer.width,
+            pointerCanvasLayer.height,
+          );
 
-          drawPoint(pointerCanvasCtx, pointer);
+          pointers.forEach((pointer, index) => {
+            if (index === activeShape) {
+              drawPoint(pointerCanvasCtx, mousePoint);
+              return;
+            }
+
+            drawPoint(pointerCanvasCtx, pointer);
+          });
         });
       },
       {
